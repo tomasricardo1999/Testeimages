@@ -1,141 +1,123 @@
-#!/usr/bin/env python3
-"""
-Extrai dados financeiros da Advanced Micro Devices (AMD) via yfinance.
+# AMD — análise financeira pronta para Google Colab
+# Para usar: abre https://colab.research.google.com/ e cola este código numa célula.
+# A primeira linha instala as bibliotecas necessárias.
 
-Instalação:
-    python -m pip install -r requirements.txt
+%pip -q install yfinance pandas matplotlib
 
-Exemplos:
-    python amd_financas.py
-    python amd_financas.py --periodo 5y --intervalo 1mo
-    python amd_financas.py --ticker AMD --saida dados_amd
-
-Os dados são obtidos do Yahoo Finance através de yfinance; podem sofrer
-atrasos, alterações de disponibilidade ou limitações do serviço. Uso para
-pesquisa/análise, não como aconselhamento financeiro.
-"""
-from __future__ import annotations
-
-import argparse
-import json
-import logging
-from pathlib import Path
-from typing import Any
-
-import pandas as pd
 import yfinance as yf
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+from IPython.display import display
 
-LOG = logging.getLogger("amd_financas")
+# Configuração
+TICKER = "AMD"
+PERIODO = "5y"       # exemplos: "1y", "2y", "5y", "max"
+INTERVALO = "1d"     # exemplos: "1d", "1wk", "1mo"
+PASTA = Path("dados_amd")
+PASTA.mkdir(exist_ok=True)
 
+amd = yf.Ticker(TICKER)
 
-def json_seguro(value: Any) -> Any:
-    """Converte valores comuns de pandas/numpy para JSON serializável."""
-    if hasattr(value, "isoformat"):
-        return value.isoformat()
-    if hasattr(value, "item"):
-        try:
-            return value.item()
-        except (ValueError, TypeError):
-            pass
-    if pd.isna(value):
-        return None
-    return str(value)
+# 1. Preços históricos
+precos = amd.history(period=PERIODO, interval=INTERVALO, auto_adjust=False)
+if precos.empty:
+    raise RuntimeError("Não foram encontrados preços. Confirma a ligação à internet e os parâmetros.")
 
+display(precos.tail())
+precos.to_csv(PASTA / "amd_historico.csv")
 
-def guardar_dataframe(df: pd.DataFrame, caminho: Path) -> bool:
-    """Guarda um DataFrame em CSV; devolve False se estiver vazio."""
-    if df is None or df.empty:
-        LOG.warning("Sem dados para %s; ficheiro não criado.", caminho.name)
-        return False
-    df.to_csv(caminho, encoding="utf-8-sig")
-    LOG.info("Guardado: %s", caminho)
-    return True
+# Gráfico 1 — preço de fecho
+plt.figure(figsize=(13, 5))
+plt.plot(precos.index, precos["Close"], label="Fecho")
+plt.title(f"{TICKER} — preço de fecho ({PERIODO})")
+plt.xlabel("Data")
+plt.ylabel("Preço (USD)")
+plt.grid(True, alpha=0.3)
+plt.legend()
+plt.tight_layout()
+plt.show()
 
+# Gráfico 2 — volume negociado
+if "Volume" in precos.columns:
+    plt.figure(figsize=(13, 4))
+    plt.plot(precos.index, precos["Volume"])
+    plt.title(f"{TICKER} — volume negociado ({PERIODO})")
+    plt.xlabel("Data")
+    plt.ylabel("Volume")
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
 
-def extrair(ticker: str, periodo: str, intervalo: str, saida: Path) -> None:
-    saida.mkdir(parents=True, exist_ok=True)
-    empresa = yf.Ticker(ticker)
+# 2. Demonstrações financeiras (dados anuais e trimestrais)
+demonstracoes = {
+    "resultados_anuais": amd.income_stmt,
+    "resultados_trimestrais": amd.quarterly_income_stmt,
+    "balanco_anual": amd.balance_sheet,
+    "balanco_trimestral": amd.quarterly_balance_sheet,
+    "fluxo_caixa_anual": amd.cashflow,
+    "fluxo_caixa_trimestral": amd.quarterly_cashflow,
+}
 
-    # Preços históricos e volume.
-    historico = empresa.history(
-        period=periodo,
-        interval=intervalo,
-        auto_adjust=False,
-        actions=True,
+for nome, tabela in demonstracoes.items():
+    if tabela is not None and not tabela.empty:
+        tabela.to_csv(PASTA / f"amd_{nome}.csv")
+        print(f"{nome}: {tabela.shape[0]} linhas × {tabela.shape[1]} períodos")
+    else:
+        print(f"{nome}: sem dados disponíveis")
+
+# Gráfico 3 — receitas e lucro líquido, se esses indicadores existirem
+resultados = amd.income_stmt
+if resultados is not None and not resultados.empty:
+    # As colunas são normalmente os períodos; as linhas, as métricas.
+    linhas = {str(indice).lower(): indice for indice in resultados.index}
+    receita_key = next((v for k, v in linhas.items() if "total revenue" in k or k == "revenue"), None)
+    lucro_key = next((v for k, v in linhas.items() if "net income" in k), None)
+
+    series = {}
+    if receita_key is not None:
+        series["Receita"] = pd.to_numeric(resultados.loc[receita_key], errors="coerce")
+    if lucro_key is not None:
+        series["Lucro líquido"] = pd.to_numeric(resultados.loc[lucro_key], errors="coerce")
+
+    if series:
+        financeiro = pd.DataFrame(series).sort_index()
+        display(financeiro)
+        financeiro.to_csv(PASTA / "amd_receita_lucro.csv")
+        ax = financeiro.plot(kind="bar", figsize=(12, 5))
+        ax.set_title(f"{TICKER} — receita e lucro líquido anual")
+        ax.set_xlabel("Período")
+        ax.set_ylabel("USD")
+        ax.grid(axis="y", alpha=0.3)
+        plt.xticks(rotation=30, ha="right")
+        plt.tight_layout()
+        plt.show()
+    else:
+        print("Não foi possível identificar receita/lucro nas demonstrações disponíveis.")
+else:
+    print("Demonstração de resultados não disponível para criar o gráfico financeiro.")
+
+# 3. Informação geral da empresa
+try:
+    info = amd.get_info()
+    chaves = [
+        "longName", "sector", "industry", "currency", "marketCap",
+        "trailingPE", "forwardPE", "priceToBook", "profitMargins",
+        "returnOnEquity", "dividendYield"
+    ]
+    resumo = {chave: info.get(chave) for chave in chaves if info.get(chave) is not None}
+    display(pd.DataFrame(resumo.items(), columns=["Indicador", "Valor"]))
+    pd.DataFrame(resumo.items(), columns=["Indicador", "Valor"]).to_csv(
+        PASTA / "amd_resumo_empresa.csv", index=False
     )
-    guardar_dataframe(historico, saida / f"{ticker.lower()}_historico.csv")
+except Exception as erro:
+    print(f"Não foi possível obter os metadados da empresa: {erro}")
 
-    # Demonstrações financeiras anuais e trimestrais.
-    tabelas = {
-        "resultados_anuais": empresa.income_stmt,
-        "resultados_trimestrais": empresa.quarterly_income_stmt,
-        "balanco_anual": empresa.balance_sheet,
-        "balanco_trimestral": empresa.quarterly_balance_sheet,
-        "fluxo_caixa_anual": empresa.cashflow,
-        "fluxo_caixa_trimestral": empresa.quarterly_cashflow,
-    }
-    for nome, tabela in tabelas.items():
-        guardar_dataframe(tabela, saida / f"{ticker.lower()}_{nome}.csv")
+# 4. Descarregar resultados
+print(f"\nFicheiros guardados na pasta: {PASTA.resolve()}")
+print("No Colab, podes transferi-los com:")
+print("from google.colab import files")
+print("files.download('dados_amd/amd_historico.csv')")
 
-    # Metadados: manter apenas campos simples para evitar JSON problemático.
-    try:
-        info = empresa.get_info()
-        info_simples = {
-            str(chave): json_seguro(valor)
-            for chave, valor in info.items()
-            if valor is None or isinstance(
-                valor, (str, int, float, bool, pd.Timestamp)
-            )
-        }
-        with (saida / f"{ticker.lower()}_empresa.json").open(
-            "w", encoding="utf-8"
-        ) as ficheiro:
-            json.dump(info_simples, ficheiro, ensure_ascii=False, indent=2)
-        LOG.info("Guardado: %s", saida / f"{ticker.lower()}_empresa.json")
-    except Exception as exc:
-        LOG.warning("Não foi possível obter os metadados da empresa: %s", exc)
-
-    # Dividendos e desdobramentos (quando disponíveis).
-    guardar_dataframe(
-        empresa.dividends.to_frame("dividendos"),
-        saida / f"{ticker.lower()}_dividendos.csv",
-    )
-    guardar_dataframe(
-        empresa.splits.to_frame("desdobramentos"),
-        saida / f"{ticker.lower()}_desdobramentos.csv",
-    )
-
-
-def main() -> int:
-    parser = argparse.ArgumentParser(
-        description="Extrai preços e demonstrações financeiras de uma ação."
-    )
-    parser.add_argument("--ticker", default="AMD", help="Símbolo Yahoo Finance (default: AMD)")
-    parser.add_argument("--periodo", default="5y", help="Período histórico, ex.: 1y, 5y, max")
-    parser.add_argument(
-        "--intervalo",
-        default="1d",
-        choices=["1d", "5d", "1wk", "1mo", "3mo"],
-        help="Intervalo dos preços históricos (default: 1d)",
-    )
-    parser.add_argument(
-        "--saida", default="dados_financeiros", help="Diretório dos ficheiros de saída"
-    )
-    parser.add_argument("--verbose", action="store_true", help="Mostrar mensagens de diagnóstico")
-    args = parser.parse_args()
-
-    logging.basicConfig(
-        level=logging.INFO if args.verbose else logging.WARNING,
-        format="%(levelname)s: %(message)s",
-    )
-    try:
-        extrair(args.ticker.upper(), args.periodo, args.intervalo, Path(args.saida))
-    except Exception as exc:
-        LOG.error("Falha ao extrair dados de %s: %s", args.ticker.upper(), exc)
-        return 1
-    print(f"Extração concluída. Verifica a pasta: {args.saida}")
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+# Nota: yfinance obtém dados do Yahoo Finance; a disponibilidade e o atraso variam.
+# Este notebook é para análise informativa, não constitui aconselhamento financeiro.
