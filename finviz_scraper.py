@@ -11,7 +11,6 @@ import csv
 import json
 import logging
 import re
-import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -60,7 +59,7 @@ CAMPOS = {
 }
 
 def _texto(celula: object) -> str:
-    return re.sub(r"\\s+", " ", celula.get_text(" ", strip=True)).strip()
+    return re.sub(r"\s+", " ", celula.get_text(" ", strip=True)).strip()
 
 def _extrair_pares(soup: BeautifulSoup) -> dict[str, str]:
     encontrados: dict[str, str] = {}
@@ -69,12 +68,15 @@ def _extrair_pares(soup: BeautifulSoup) -> dict[str, str]:
         textos = [_texto(c) for c in celulas]
         for i in range(0, len(textos) - 1, 2):
             chave, valor = textos[i], textos[i + 1]
-            if chave in CAMPOS and valor and valor != "-":
+            if chave == "EPS next Y" and valor and valor != "-":
+                destino = "crescimento_eps_proximo_ano" if "%" in valor else "eps_proximo_ano"
+                encontrados[destino] = valor
+            elif chave in CAMPOS and valor and valor != "-":
                 encontrados[CAMPOS[chave]] = valor
     return encontrados
 
 def recolher_metricas(ticker: str, pasta_saida: Path) -> dict:
-    url = f"https://finviz.com/quote.ashx?t={ticker.upper()}&p=d"
+    url = f"https://finviz.com/stock?t={ticker.upper()}"
     headers = {
         "User-Agent": "Mozilla/5.0 (compatible; AMD-Financial-Dashboard/1.0; educational use)",
         "Accept": "text/html,application/xhtml+xml",
