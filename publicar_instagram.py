@@ -8,8 +8,10 @@ from urllib.parse import quote
 
 import requests
 
-ticker = os.environ["TICKER"].upper()
+ticker = os.environ["TICKER"].strip().upper()
 style = os.environ["ESTILO"]
+if not ticker or len(ticker) > 15 or not all(c.isalnum() or c in ".-" for c in ticker) or not ticker[0].isalnum():
+    raise SystemExit("Ticker inválido.")
 ig_user_id = os.environ.get("IG_USER_ID", "").strip()
 token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
 repo = os.environ["GITHUB_REPOSITORY"]
@@ -21,7 +23,7 @@ if not ig_user_id or not token:
 if style not in {"standard", "editorial", "institucional", "criativo"}:
     raise SystemExit(f"Estilo inválido: {style}")
 
-base = Path("dados_main" if ticker == "MAIN" else "dados_amd") / "instagram"
+base = Path(f"dados_{ticker.lower()}") / "instagram"
 folder = base if style == "standard" else base / "variantes" / style
 caption_path = folder / "legenda_instagram.txt"
 caption = caption_path.read_text(encoding="utf-8").strip()
