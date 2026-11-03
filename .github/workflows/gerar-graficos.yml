@@ -6,6 +6,8 @@ on:
     paths:
       - "amd_financas.py"
       - "gerar_carrossel.py"
+      - "finviz_scraper.py"
+      - "gerar_carrossel_finviz.py"
       - "requirements.txt"
       - ".github/workflows/gerar-graficos.yml"
   workflow_dispatch:
