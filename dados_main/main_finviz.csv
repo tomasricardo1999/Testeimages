@@ -1,0 +1,37 @@
+﻿Indicador,Valor,Fonte,Capturado em UTC
+capitalizacao_mercado,5.28B,Finviz,2026-11-03T20:13:12+00:00
+enterprise_value,7.76B,Finviz,2026-11-03T20:13:12+00:00
+dividendo_ttm,3.10 ( 5.49% ),Finviz,2026-11-03T20:13:12+00:00
+payout,55.06%,Finviz,2026-11-03T20:13:12+00:00
+pe_trailing,11.37,Finviz,2026-11-03T20:13:12+00:00
+pe_forward,14.58,Finviz,2026-11-03T20:13:12+00:00
+peg,145.84,Finviz,2026-11-03T20:13:12+00:00
+ps,7.74,Finviz,2026-11-03T20:13:12+00:00
+pb,1.66,Finviz,2026-11-03T20:13:12+00:00
+p_fcf,14.99,Finviz,2026-11-03T20:13:12+00:00
+ev_ebitda,12.54,Finviz,2026-11-03T20:13:12+00:00
+ev_sales,11.38,Finviz,2026-11-03T20:13:12+00:00
+quick_ratio,0.13,Finviz,2026-11-03T20:13:12+00:00
+current_ratio,0.13,Finviz,2026-11-03T20:13:12+00:00
+divida_capital_proprio,0.80,Finviz,2026-11-03T20:13:12+00:00
+divida_longo_prazo_capital_proprio,0.57,Finviz,2026-11-03T20:13:12+00:00
+eps_ttm,4.96,Finviz,2026-11-03T20:13:12+00:00
+eps_proximo_ano,3.87,Finviz,2026-11-03T20:13:12+00:00
+crescimento_eps_ano_atual,-4.11%,Finviz,2026-11-03T20:13:12+00:00
+crescimento_eps_proximo_ano,2.18%,Finviz,2026-11-03T20:13:12+00:00
+crescimento_eps_5_anos,0.10%,Finviz,2026-11-03T20:13:12+00:00
+crescimento_eps_ttm,-18.26%,Finviz,2026-11-03T20:13:12+00:00
+crescimento_vendas_ttm,3.49%,Finviz,2026-11-03T20:13:12+00:00
+crescimento_vendas_trimestre,-6.55%,Finviz,2026-11-03T20:13:12+00:00
+roa,8.04%,Finviz,2026-11-03T20:13:12+00:00
+roe,14.92%,Finviz,2026-11-03T20:13:12+00:00
+roic,9.08%,Finviz,2026-11-03T20:13:12+00:00
+margem_bruta,100.00%,Finviz,2026-11-03T20:13:12+00:00
+margem_operacional,90.77%,Finviz,2026-11-03T20:13:12+00:00
+margem_liquida,66.18%,Finviz,2026-11-03T20:13:12+00:00
+short_float,10.65%,Finviz,2026-11-03T20:13:12+00:00
+maximo_52_semanas,64.15 -12.02%,Finviz,2026-11-03T20:13:12+00:00
+minimo_52_semanas,48.40 16.61%,Finviz,2026-11-03T20:13:12+00:00
+consenso_analistas,2.50,Finviz,2026-11-03T20:13:12+00:00
+preco_alvo_analistas,59.43,Finviz,2026-11-03T20:13:12+00:00
+preco,56.44,Finviz,2026-11-03T20:13:12+00:00
