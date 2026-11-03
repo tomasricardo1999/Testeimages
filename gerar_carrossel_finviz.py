@@ -42,7 +42,7 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
     pasta.mkdir(parents=True, exist_ok=True)
     m = dados.get("metricas", {}) if dados else {}
     ok = dados.get("estado") == "ok" and bool(m)
-    capturado = str(dados.get("capturado_em_utc", "sem dados"))[:10]
+    capturado = str(dados.get("capturado_em_utc", "sem dados"))
     fonte = "Métricas recolhidas do Finviz" if ok else "Finviz indisponível nesta execução; métricas não apresentadas"
     grupos = [
         ("Avaliação bolsista", [
@@ -61,7 +61,7 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
             ("Margem bruta", "margem_bruta", "TTM / últimos 12 meses; snapshot Finviz"),
             ("Margem operacional", "margem_operacional", "TTM / últimos 12 meses; snapshot Finviz"),
             ("Margem líquida", "margem_liquida", "TTM / últimos 12 meses; snapshot Finviz"),
-            ("ROE  •  ROA  •  ROIC", None, "Retorno sobre capital próprio, ativos e capital investido"),
+            ("ROE  •  ROA  •  ROIC", None, "Retornos sobre capital próprio, ativos e capital investido; TTM / snapshot Finviz"),
         ]),
         ("Balanço e risco", [
             ("Debt / Equity", "divida_capital_proprio", "Último balanço disponível; Finviz não fornece aqui a data exata do balanço"),
@@ -99,8 +99,8 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
         fig.text(.09, .55, "Os dados do Finviz não foram obtidos.", color=TEXTO, fontsize=17, weight="bold")
         fig.text(.09, .45, "O carrossel mantém os slides históricos; esta secção será preenchida numa execução futura.",
                  color=SECUNDARIO, fontsize=11, wrap=True)
-    fig.text(.09, .13, "Indicadores descritivos, não uma recomendação de compra ou venda.",
-             color=SECUNDARIO, fontsize=9, wrap=True)
+    fig.text(.09, .13, "Snapshot: preço e múltiplos na data/hora acima; rácios de balanço no último balanço disponível (data exata não indicada pelo Finviz). Indicadores descritivos, não uma recomendação.",
+             color=SECUNDARIO, fontsize=7.5, wrap=True)
     fig.savefig(pasta / "slide_11_conclusao.png", dpi=135, facecolor=FUNDO)
     plt.close(fig)
 
