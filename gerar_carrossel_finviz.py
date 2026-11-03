@@ -95,12 +95,12 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
             ("Endividamento", f'Debt/Equity {m.get("divida_capital_proprio", "N/D")}', "Comparar com empresas do mesmo setor"),
         ]
         # Layout compacto próprio: evita que a quarta métrica colida com a nota metodológica.
-        y = .67
+        y = .66
         for rotulo, valor, nota in resumo:
-            fig.text(.09, y, rotulo.upper(), color=SECUNDARIO, fontsize=8.5, weight="bold")
-            fig.text(.09, y-.045, valor, color=TEXTO, fontsize=19, weight="bold")
-            fig.text(.09, y-.078, nota, color=SECUNDARIO, fontsize=7.5)
-            y -= .135
+            fig.text(.09, y, rotulo.upper(), color=SECUNDARIO, fontsize=8, weight="bold")
+            fig.text(.09, y-.042, valor, color=TEXTO, fontsize=16.5, weight="bold")
+            fig.text(.09, y-.073, nota, color=SECUNDARIO, fontsize=7)
+            y -= .15
     else:
         fig.text(.09, .55, "Os dados do Finviz não foram obtidos.", color=TEXTO, fontsize=17, weight="bold")
         fig.text(.09, .45, "O carrossel mantém os slides históricos; esta secção será preenchida numa execução futura.",
