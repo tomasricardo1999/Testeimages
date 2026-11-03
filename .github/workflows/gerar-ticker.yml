@@ -1,0 +1,95 @@
+name: Gerar carrossel de qualquer ação
+
+on:
+  workflow_dispatch:
+    inputs:
+      ticker:
+        description: "Ticker da ação (ex.: AAPL, NVDA, KO, O, MSFT)"
+        required: true
+        type: string
+      periodo:
+        description: "Histórico a analisar"
+        required: true
+        type: choice
+        default: "5y"
+        options:
+          - "1y"
+          - "2y"
+          - "5y"
+          - "10y"
+          - "max"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gerar-ticker-${{ inputs.ticker }}
+  cancel-in-progress: false
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obter repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instalar dependências
+        run: python -m pip install -r requirements.txt
+
+      - name: Validar ticker e definir pasta de saída
+        id: config
+        env:
+          TICKER_INPUT: ${{ inputs.ticker }}
+        run: |
+          TICKER="$(printf '%s' "$TICKER_INPUT" | tr '[:lower:]' '[:upper:]' | xargs)"
+          if [[ ! "$TICKER" =~ ^[A-Z0-9][A-Z0-9.-]{0,14}$ ]]; then
+            echo "Ticker inválido: use apenas letras, números, ponto ou hífen (máx. 15 caracteres)."
+            exit 1
+          fi
+          echo "ticker=$TICKER" >> "$GITHUB_OUTPUT"
+          echo "saida=dados_$(printf '%s' "$TICKER" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
+
+      - name: Recolher dados e gerar 11 slides
+        env:
+          TICKER: ${{ steps.config.outputs.ticker }}
+          SAIDA: ${{ steps.config.outputs.saida }}
+          PERIODO: ${{ inputs.periodo }}
+        run: python amd_financas.py --ticker "$TICKER" --periodo "$PERIODO" --saida "$SAIDA"
+
+      - name: Criar variantes visuais
+        env:
+          TICKER: ${{ steps.config.outputs.ticker }}
+          SAIDA: ${{ steps.config.outputs.saida }}
+        run: python gerar_variantes.py --ticker "$TICKER" --dados "$SAIDA"
+
+      - name: Validar e preparar checklist de aprovação
+        env:
+          TICKER: ${{ steps.config.outputs.ticker }}
+          SAIDA: ${{ steps.config.outputs.saida }}
+        run: python preparar_aprovacao.py --ticker "$TICKER" --dados "$SAIDA"
+
+      - name: Guardar resultados no repositório
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SAIDA: ${{ steps.config.outputs.saida }}
+          TICKER: ${{ steps.config.outputs.ticker }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$SAIDA/"
+          if git diff --cached --quiet; then
+            echo "Não há alterações nos dados ou imagens."
+            exit 0
+          fi
+          git commit -m "Gera carrossel personalizado para $TICKER"
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" fetch origin main
+          git rebase FETCH_HEAD
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin HEAD:main
