@@ -9,6 +9,7 @@ on:
       - "finviz_scraper.py"
       - "gerar_carrossel_finviz.py"
       - "gerar_variantes.py"
+      - "preparar_aprovacao.py"
       - "requirements.txt"
       - ".github/workflows/gerar-graficos.yml"
   workflow_dispatch:
@@ -45,6 +46,10 @@ jobs:
         run: python amd_financas.py --ticker MAIN --periodo 5y --saida dados_main
       - name: Gerar templates alternativos da Main Street Capital
         run: python gerar_variantes.py --ticker MAIN --dados dados_main
+      - name: Validar e preparar aprovação manual AMD
+        run: python preparar_aprovacao.py --ticker AMD --dados dados_amd
+      - name: Validar e preparar aprovação manual MAIN
+        run: python preparar_aprovacao.py --ticker MAIN --dados dados_main
       - name: Guardar resultados no repositório
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
