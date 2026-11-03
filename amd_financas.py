@@ -167,3 +167,5 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+# Execução automatizada disponível através de .github/workflows/gerar-graficos.yml.
