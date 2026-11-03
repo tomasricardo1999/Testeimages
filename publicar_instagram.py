@@ -79,6 +79,9 @@ for jpeg in slides[:10]:
     })
     child_ids.append(item["id"])
 
+for child_id in child_ids:
+    wait_until_ready(child_id)
+
 carousel = api_post(f"{ig_user_id}/media", {
     "media_type": "CAROUSEL",
     "children": ",".join(child_ids),
