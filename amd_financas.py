@@ -1,77 +1,70 @@
-# AMD — análise financeira pronta para Google Colab
-# Para usar: abre https://colab.research.google.com/ e cola este código numa célula.
-# A primeira linha instala as bibliotecas necessárias.
+#!/usr/bin/env python3
+"""
+Análise financeira da AMD com gráficos guardados no próprio repositório.
 
-%pip -q install yfinance pandas matplotlib
+Instalação:
+    python -m pip install -r requirements.txt
 
-import yfinance as yf
-import pandas as pd
-import matplotlib.pyplot as plt
+Execução:
+    python amd_financas.py
+    python amd_financas.py --ticker NVDA --periodo 5y
+
+Os dados são obtidos via yfinance (Yahoo Finance) e podem sofrer atrasos
+ou alterações de disponibilidade. Uso informativo, não é aconselhamento financeiro.
+"""
+from __future__ import annotations
+
+import argparse
+import logging
 from pathlib import Path
-from IPython.display import display
 
-# Configuração
-TICKER = "AMD"
-PERIODO = "5y"       # exemplos: "1y", "2y", "5y", "max"
-INTERVALO = "1d"     # exemplos: "1d", "1wk", "1mo"
-PASTA = Path("dados_amd")
-PASTA.mkdir(exist_ok=True)
+import matplotlib
+matplotlib.use("Agg")  # permite gerar PNGs em ambientes sem interface gráfica
+import matplotlib.pyplot as plt
+import pandas as pd
+import yfinance as yf
 
-amd = yf.Ticker(TICKER)
+LOG = logging.getLogger("analise_financeira")
 
-# 1. Preços históricos
-precos = amd.history(period=PERIODO, interval=INTERVALO, auto_adjust=False)
-if precos.empty:
-    raise RuntimeError("Não foram encontrados preços. Confirma a ligação à internet e os parâmetros.")
 
-display(precos.tail())
-precos.to_csv(PASTA / "amd_historico.csv")
+def guardar_grafico(fig: plt.Figure, caminho: Path) -> None:
+    """Guarda o gráfico em PNG e liberta os recursos da figura."""
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(caminho, dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    LOG.info("Gráfico guardado: %s", caminho)
 
-# Gráfico 1 — preço de fecho
-plt.figure(figsize=(13, 5))
-plt.plot(precos.index, precos["Close"], label="Fecho")
-plt.title(f"{TICKER} — preço de fecho ({PERIODO})")
-plt.xlabel("Data")
-plt.ylabel("Preço (USD)")
-plt.grid(True, alpha=0.3)
-plt.legend()
-plt.tight_layout()
-plt.show()
 
-# Gráfico 2 — volume negociado
-if "Volume" in precos.columns:
-    plt.figure(figsize=(13, 4))
-    plt.plot(precos.index, precos["Volume"])
-    plt.title(f"{TICKER} — volume negociado ({PERIODO})")
-    plt.xlabel("Data")
-    plt.ylabel("Volume")
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.show()
+def gerar_graficos(ticker: str, periodo: str, precos: pd.DataFrame,
+                    resultados: pd.DataFrame, pasta_graficos: Path) -> None:
+    """Cria e guarda gráficos de preço, volume e resultados financeiros."""
+    if precos is not None and not precos.empty:
+        fig, ax = plt.subplots(figsize=(13, 5))
+        ax.plot(precos.index, precos["Close"], label="Preço de fecho")
+        ax.set(title=f"{ticker} — preço de fecho ({periodo})",
+               xlabel="Data", ylabel="Preço (USD)")
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+        fig.tight_layout()
+        guardar_grafico(fig, pasta_graficos / f"{ticker.lower()}_preco_fecho.png")
 
-# 2. Demonstrações financeiras (dados anuais e trimestrais)
-demonstracoes = {
-    "resultados_anuais": amd.income_stmt,
-    "resultados_trimestrais": amd.quarterly_income_stmt,
-    "balanco_anual": amd.balance_sheet,
-    "balanco_trimestral": amd.quarterly_balance_sheet,
-    "fluxo_caixa_anual": amd.cashflow,
-    "fluxo_caixa_trimestral": amd.quarterly_cashflow,
-}
+        if "Volume" in precos.columns:
+            fig, ax = plt.subplots(figsize=(13, 4))
+            ax.bar(precos.index, precos["Volume"], width=1.0)
+            ax.set(title=f"{ticker} — volume negociado ({periodo})",
+                   xlabel="Data", ylabel="Volume")
+            ax.grid(True, axis="y", alpha=0.3)
+            fig.tight_layout()
+            guardar_grafico(fig, pasta_graficos / f"{ticker.lower()}_volume.png")
 
-for nome, tabela in demonstracoes.items():
-    if tabela is not None and not tabela.empty:
-        tabela.to_csv(PASTA / f"amd_{nome}.csv")
-        print(f"{nome}: {tabela.shape[0]} linhas × {tabela.shape[1]} períodos")
-    else:
-        print(f"{nome}: sem dados disponíveis")
+    if resultados is None or resultados.empty:
+        LOG.warning("Sem demonstração de resultados para gerar o gráfico financeiro.")
+        return
 
-# Gráfico 3 — receitas e lucro líquido, se esses indicadores existirem
-resultados = amd.income_stmt
-if resultados is not None and not resultados.empty:
-    # As colunas são normalmente os períodos; as linhas, as métricas.
-    linhas = {str(indice).lower(): indice for indice in resultados.index}
-    receita_key = next((v for k, v in linhas.items() if "total revenue" in k or k == "revenue"), None)
+    linhas = {str(indice).strip().lower(): indice for indice in resultados.index}
+    receita_key = next(
+        (v for k, v in linhas.items() if "total revenue" in k or k == "revenue"), None
+    )
     lucro_key = next((v for k, v in linhas.items() if "net income" in k), None)
 
     series = {}
@@ -80,44 +73,97 @@ if resultados is not None and not resultados.empty:
     if lucro_key is not None:
         series["Lucro líquido"] = pd.to_numeric(resultados.loc[lucro_key], errors="coerce")
 
-    if series:
-        financeiro = pd.DataFrame(series).sort_index()
-        display(financeiro)
-        financeiro.to_csv(PASTA / "amd_receita_lucro.csv")
-        ax = financeiro.plot(kind="bar", figsize=(12, 5))
-        ax.set_title(f"{TICKER} — receita e lucro líquido anual")
-        ax.set_xlabel("Período")
-        ax.set_ylabel("USD")
-        ax.grid(axis="y", alpha=0.3)
-        plt.xticks(rotation=30, ha="right")
-        plt.tight_layout()
-        plt.show()
+    if not series:
+        LOG.warning("Não foram encontradas linhas de receita ou lucro líquido.")
+        return
+
+    financeiro = pd.DataFrame(series).sort_index()
+    financeiro = financeiro.dropna(how="all")
+    financeiro.to_csv(pasta_graficos.parent / f"{ticker.lower()}_receita_lucro.csv")
+
+    # Escalas separadas evitam que a receita esconda a evolução do lucro.
+    fig, ax1 = plt.subplots(figsize=(12, 5))
+    if "Receita" in financeiro:
+        ax1.plot(financeiro.index, financeiro["Receita"], marker="o",
+                 label="Receita", linewidth=2)
+        ax1.set_ylabel("Receita (USD)")
+    ax1.set_xlabel("Período")
+    ax1.set_title(f"{ticker} — evolução anual da receita e do lucro líquido")
+    ax1.grid(True, alpha=0.3)
+    if "Lucro líquido" in financeiro:
+        ax2 = ax1.twinx()
+        ax2.plot(financeiro.index, financeiro["Lucro líquido"], marker="s",
+                 label="Lucro líquido", linewidth=2)
+        ax2.set_ylabel("Lucro líquido (USD)")
+        linhas_grafico = ax1.get_lines() + ax2.get_lines()
     else:
-        print("Não foi possível identificar receita/lucro nas demonstrações disponíveis.")
-else:
-    print("Demonstração de resultados não disponível para criar o gráfico financeiro.")
+        linhas_grafico = ax1.get_lines()
+    ax1.legend(linhas_grafico, [linha.get_label() for linha in linhas_grafico],
+               loc="best")
+    fig.autofmt_xdate()
+    fig.tight_layout()
+    guardar_grafico(fig, pasta_graficos / f"{ticker.lower()}_receita_lucro.png")
 
-# 3. Informação geral da empresa
-try:
-    info = amd.get_info()
-    chaves = [
-        "longName", "sector", "industry", "currency", "marketCap",
-        "trailingPE", "forwardPE", "priceToBook", "profitMargins",
-        "returnOnEquity", "dividendYield"
-    ]
-    resumo = {chave: info.get(chave) for chave in chaves if info.get(chave) is not None}
-    display(pd.DataFrame(resumo.items(), columns=["Indicador", "Valor"]))
-    pd.DataFrame(resumo.items(), columns=["Indicador", "Valor"]).to_csv(
-        PASTA / "amd_resumo_empresa.csv", index=False
-    )
-except Exception as erro:
-    print(f"Não foi possível obter os metadados da empresa: {erro}")
 
-# 4. Descarregar resultados
-print(f"\nFicheiros guardados na pasta: {PASTA.resolve()}")
-print("No Colab, podes transferi-los com:")
-print("from google.colab import files")
-print("files.download('dados_amd/amd_historico.csv')")
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Análise financeira e gráficos em PNG.")
+    parser.add_argument("--ticker", default="AMD", help="Símbolo Yahoo Finance (default: AMD)")
+    parser.add_argument("--periodo", default="5y", help="Período histórico (ex.: 1y, 5y, max)")
+    parser.add_argument("--intervalo", default="1d",
+                        choices=["1d", "5d", "1wk", "1mo", "3mo"])
+    parser.add_argument("--saida", default="dados_amd", help="Pasta para CSVs e gráficos")
+    args = parser.parse_args()
 
-# Nota: yfinance obtém dados do Yahoo Finance; a disponibilidade e o atraso variam.
-# Este notebook é para análise informativa, não constitui aconselhamento financeiro.
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+    ticker = args.ticker.upper()
+    saida = Path(args.saida)
+    pasta_graficos = saida / "graficos"
+    saida.mkdir(parents=True, exist_ok=True)
+
+    empresa = yf.Ticker(ticker)
+    precos = empresa.history(period=args.periodo, interval=args.intervalo,
+                             auto_adjust=False, actions=True)
+    if precos.empty:
+        LOG.error("Não foram encontrados preços para %s.", ticker)
+        return 1
+    precos.to_csv(saida / f"{ticker.lower()}_historico.csv", encoding="utf-8-sig")
+
+    demonstracoes = {
+        "resultados_anuais": empresa.income_stmt,
+        "resultados_trimestrais": empresa.quarterly_income_stmt,
+        "balanco_anual": empresa.balance_sheet,
+        "balanco_trimestral": empresa.quarterly_balance_sheet,
+        "fluxo_caixa_anual": empresa.cashflow,
+        "fluxo_caixa_trimestral": empresa.quarterly_cashflow,
+    }
+    for nome, tabela in demonstracoes.items():
+        if tabela is not None and not tabela.empty:
+            tabela.to_csv(saida / f"{ticker.lower()}_{nome}.csv",
+                          encoding="utf-8-sig")
+            LOG.info("%s: %s linhas × %s períodos", nome, *tabela.shape)
+        else:
+            LOG.warning("%s: sem dados disponíveis", nome)
+
+    gerar_graficos(ticker, args.periodo, precos,
+                   demonstracoes["resultados_anuais"], pasta_graficos)
+
+    try:
+        info = empresa.get_info()
+        chaves = ["longName", "sector", "industry", "currency", "marketCap",
+                  "trailingPE", "forwardPE", "priceToBook", "profitMargins",
+                  "returnOnEquity", "dividendYield"]
+        resumo = {chave: info.get(chave) for chave in chaves
+                  if info.get(chave) is not None}
+        pd.DataFrame(resumo.items(), columns=["Indicador", "Valor"]).to_csv(
+            saida / f"{ticker.lower()}_resumo_empresa.csv",
+            index=False, encoding="utf-8-sig")
+    except Exception as exc:
+        LOG.warning("Não foi possível obter os metadados da empresa: %s", exc)
+
+    LOG.info("Concluído. CSVs: %s | Gráficos PNG: %s",
+             saida.resolve(), pasta_graficos.resolve())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
