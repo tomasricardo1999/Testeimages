@@ -30,13 +30,13 @@ def _base(ticker: str, numero: int, titulo: str, subtitulo: str, data: str):
     return fig
 
 def _cartoes(fig, linhas):
-    y = .65
+    y = .66
     for rotulo, valor, nota in linhas:
-        fig.text(.09, y, rotulo.upper(), color=SECUNDARIO, fontsize=9, weight="bold")
-        fig.text(.09, y-.075, valor, color=TEXTO, fontsize=25, weight="bold")
+        fig.text(.09, y, rotulo.upper(), color=SECUNDARIO, fontsize=8.5, weight="bold")
+        fig.text(.09, y-.06, valor, color=TEXTO, fontsize=22, weight="bold")
         if nota:
-            fig.text(.09, y-.12, nota, color=SECUNDARIO, fontsize=9)
-        y -= .205
+            fig.text(.09, y-.10, nota, color=SECUNDARIO, fontsize=8)
+        y -= .155
 
 def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
     pasta.mkdir(parents=True, exist_ok=True)
