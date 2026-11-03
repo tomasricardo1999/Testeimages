@@ -24,6 +24,8 @@ import pandas as pd
 import yfinance as yf
 
 from gerar_carrossel import gerar_carrossel
+from finviz_scraper import recolher_metricas
+from gerar_carrossel_finviz import gerar_carrossel_finviz
 
 LOG = logging.getLogger("analise_financeira")
 
@@ -149,6 +151,8 @@ def main() -> int:
                    demonstracoes["resultados_anuais"], pasta_graficos)
     gerar_carrossel(ticker, precos, demonstracoes["resultados_anuais"],
                     saida / "instagram", args.periodo)
+    metricas_finviz = recolher_metricas(ticker, saida)
+    gerar_carrossel_finviz(ticker, metricas_finviz, saida / "instagram")
 
     try:
         info = empresa.get_info()
