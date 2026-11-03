@@ -5,11 +5,8 @@ on:
     inputs:
       ticker:
         description: Empresa a publicar
-        type: choice
+        type: string
         required: true
-        options:
-          - AMD
-          - MAIN
       estilo:
         description: Variante visual aprovada
         type: choice
@@ -65,7 +62,12 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add dados_amd/instagram/ dados_main/instagram/
+          TICKER="$(printf '%s' "${{ inputs.ticker }}" | tr '[:upper:]' '[:lower:]')"
+          if [[ ! "$TICKER" =~ ^[a-z0-9][a-z0-9.-]{0,14}$ ]]; then
+            echo "Ticker inválido."
+            exit 1
+          fi
+          git add "dados_$TICKER/instagram/"
           if git diff --cached --quiet; then
             echo "JPEGs já estão atualizados."
           else
