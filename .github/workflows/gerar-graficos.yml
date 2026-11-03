@@ -19,7 +19,7 @@ permissions:
 
 concurrency:
   group: atualizar-graficos
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   gerar-graficos:
@@ -50,4 +50,6 @@ jobs:
             exit 0
           fi
           git commit -m "Atualiza gráficos e carrossel financeiro da AMD"
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" fetch origin main
+          git rebase FETCH_HEAD
           git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin HEAD:main
