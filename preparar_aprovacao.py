@@ -47,10 +47,15 @@ def main():
         "[ ] Confirmar adequação das métricas ao modelo de negócio da empresa.",
         "[ ] Aprovar expressamente o conjunto antes de qualquer publicação.",
         "",
-        "Nota MAIN/BDC: validar NII por ação, distribuições declaradas por ação,",
-        "cobertura do dividendo por NII e dividendos especiais/extraordinários.",
-        "Dividend yield e payout são snapshots e não provam cobertura futura.",
-        "",
+    ]
+    if args.ticker.upper() == "MAIN":
+        lines += [
+            "Nota MAIN/BDC: validar NII por ação, distribuições declaradas por ação,",
+            "cobertura do dividendo por NII e dividendos especiais/extraordinários.",
+            "Dividend yield e payout são snapshots e não provam cobertura futura.",
+            "",
+        ]
+    lines += [
         "Resultado da validação estrutural:",
     ]
     lines += [f"ERRO: {e}" for e in errors] if errors else [
