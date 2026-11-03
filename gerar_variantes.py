@@ -79,7 +79,11 @@ def carregar_dados():
     if not finviz_json.exists():
         raise FileNotFoundError(f"Falta o ficheiro {finviz_json}")
 
-    precos = pd.read_csv(historico_csv, index_col=0, parse_dates=True)
+    precos = pd.read_csv(historico_csv, index_col=0)
+    # O CSV pode misturar datas com e sem fuso horário; normalizar para UTC
+    # e remover o fuso mantém um DatetimeIndex consistente em todas as versões de pandas.
+    precos.index = pd.to_datetime(precos.index, utc=True, errors="coerce").tz_convert(None)
+    precos = precos.loc[~precos.index.isna()].sort_index()
     resultados = pd.read_csv(resultados_csv, index_col=0)
     with finviz_json.open("r", encoding="utf-8") as ficheiro:
         dados_finviz = json.load(ficheiro)
