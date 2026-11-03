@@ -148,8 +148,7 @@ def gerar_carrossel(ticker: str, precos: pd.DataFrame, resultados: pd.DataFrame,
         ax.tick_params(axis="x", rotation=0)
         ax.legend(facecolor=PAINEL, labelcolor=TEXTO, fontsize=8)
     else:
-        fig.text(0.10, 0.48, "A demonstração de resultados não forneceu
-receita/lucro para construir este gráfico.",
+        fig.text(0.10, 0.48, "A demonstração de resultados não forneceu\\nreceita/lucro para construir este gráfico.",
                  color=SECUNDARIO, fontsize=13)
     fig.savefig(pasta / "slide_04_receita_lucro.png", dpi=135, facecolor=FUNDO)
     plt.close(fig)
