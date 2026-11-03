@@ -32,7 +32,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: instagram-publish-${{ inputs.ticker }}-${{ inputs.estilo }}
+  group: instagram-publish
   cancel-in-progress: false
 
 jobs:
