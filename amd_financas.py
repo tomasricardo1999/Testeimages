@@ -19,28 +19,30 @@ import logging
 from pathlib import Path
 
 import matplotlib
-matplotlib.use("Agg")  # permite gerar PNGs em ambientes sem interface gráfica
-import matplotlib.pyplot as plt
+matplotlib.use("Agg")
 import pandas as pd
 import yfinance as yf
+
+from gerar_carrossel import gerar_carrossel
 
 LOG = logging.getLogger("analise_financeira")
 
 
-def guardar_grafico(fig: plt.Figure, caminho: Path) -> None:
-    """Guarda o gráfico em PNG e liberta os recursos da figura."""
+def guardar_grafico(fig, caminho: Path) -> None:
     caminho.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(caminho, dpi=160, bbox_inches="tight")
+    import matplotlib.pyplot as plt
     plt.close(fig)
     LOG.info("Gráfico guardado: %s", caminho)
 
 
 def gerar_graficos(ticker: str, periodo: str, precos: pd.DataFrame,
                     resultados: pd.DataFrame, pasta_graficos: Path) -> None:
-    """Cria e guarda gráficos de preço, volume e resultados financeiros."""
+    import matplotlib.pyplot as plt
+
     if precos is not None and not precos.empty:
         fig, ax = plt.subplots(figsize=(13, 5))
-        ax.plot(precos.index, precos["Close"], label="Preço de fecho")
+        ax.plot(precos.index, precos["Close"], label="Preço de fecho", color="#e21b2d")
         ax.set(title=f"{ticker} — preço de fecho ({periodo})",
                xlabel="Data", ylabel="Preço (USD)")
         ax.grid(True, alpha=0.3)
@@ -50,7 +52,7 @@ def gerar_graficos(ticker: str, periodo: str, precos: pd.DataFrame,
 
         if "Volume" in precos.columns:
             fig, ax = plt.subplots(figsize=(13, 4))
-            ax.bar(precos.index, precos["Volume"], width=1.0)
+            ax.bar(precos.index, precos["Volume"], width=1.0, color="#e21b2d")
             ax.set(title=f"{ticker} — volume negociado ({periodo})",
                    xlabel="Data", ylabel="Volume")
             ax.grid(True, axis="y", alpha=0.3)
@@ -77,15 +79,13 @@ def gerar_graficos(ticker: str, periodo: str, precos: pd.DataFrame,
         LOG.warning("Não foram encontradas linhas de receita ou lucro líquido.")
         return
 
-    financeiro = pd.DataFrame(series).sort_index()
-    financeiro = financeiro.dropna(how="all")
+    financeiro = pd.DataFrame(series).sort_index().dropna(how="all")
     financeiro.to_csv(pasta_graficos.parent / f"{ticker.lower()}_receita_lucro.csv")
 
-    # Escalas separadas evitam que a receita esconda a evolução do lucro.
     fig, ax1 = plt.subplots(figsize=(12, 5))
     if "Receita" in financeiro:
         ax1.plot(financeiro.index, financeiro["Receita"], marker="o",
-                 label="Receita", linewidth=2)
+                 label="Receita", linewidth=2, color="#e21b2d")
         ax1.set_ylabel("Receita (USD)")
     ax1.set_xlabel("Período")
     ax1.set_title(f"{ticker} — evolução anual da receita e do lucro líquido")
@@ -93,7 +93,7 @@ def gerar_graficos(ticker: str, periodo: str, precos: pd.DataFrame,
     if "Lucro líquido" in financeiro:
         ax2 = ax1.twinx()
         ax2.plot(financeiro.index, financeiro["Lucro líquido"], marker="s",
-                 label="Lucro líquido", linewidth=2)
+                 label="Lucro líquido", linewidth=2, color="#55c49a")
         ax2.set_ylabel("Lucro líquido (USD)")
         linhas_grafico = ax1.get_lines() + ax2.get_lines()
     else:
@@ -118,6 +118,7 @@ def main() -> int:
     ticker = args.ticker.upper()
     saida = Path(args.saida)
     pasta_graficos = saida / "graficos"
+    pasta_graficos.mkdir(parents=True, exist_ok=True)
     saida.mkdir(parents=True, exist_ok=True)
 
     empresa = yf.Ticker(ticker)
@@ -146,6 +147,8 @@ def main() -> int:
 
     gerar_graficos(ticker, args.periodo, precos,
                    demonstracoes["resultados_anuais"], pasta_graficos)
+    gerar_carrossel(ticker, precos, demonstracoes["resultados_anuais"],
+                    saida / "instagram", args.periodo)
 
     try:
         info = empresa.get_info()
@@ -160,12 +163,10 @@ def main() -> int:
     except Exception as exc:
         LOG.warning("Não foi possível obter os metadados da empresa: %s", exc)
 
-    LOG.info("Concluído. CSVs: %s | Gráficos PNG: %s",
-             saida.resolve(), pasta_graficos.resolve())
+    LOG.info("Concluído. Gráficos: %s | Carrossel: %s",
+             pasta_graficos.resolve(), (saida / "instagram").resolve())
     return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
-# Execução automatizada disponível através de .github/workflows/gerar-graficos.yml.
