@@ -1,0 +1,1 @@
+AMD: análise fundamentalista complementar com métricas do Finviz.\n\nCaptura dos dados: 2026-11-03 (UTC). Fonte: Finviz — https://finviz.com/stock?t=AMD.\nP/E, Forward P/E e PEG dependem de resultados históricos e estimativas; as previsões podem mudar. Compare sempre empresas do mesmo setor.\nConteúdo educativo, não constitui aconselhamento financeiro.
