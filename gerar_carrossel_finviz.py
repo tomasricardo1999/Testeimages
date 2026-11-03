@@ -94,22 +94,19 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
             ("Rentabilidade", f'Margem operacional {m.get("margem_operacional", "N/D")}', "Avaliar em conjunto com a margem líquida"),
             ("Endividamento", f'Debt/Equity {m.get("divida_capital_proprio", "N/D")}', "Comparar com empresas do mesmo setor"),
         ]
-        _cartoes(fig, resumo)
+        # Layout compacto próprio: evita que a quarta métrica colida com a nota metodológica.
+        y = .67
+        for rotulo, valor, nota in resumo:
+            fig.text(.09, y, rotulo.upper(), color=SECUNDARIO, fontsize=8.5, weight="bold")
+            fig.text(.09, y-.045, valor, color=TEXTO, fontsize=19, weight="bold")
+            fig.text(.09, y-.078, nota, color=SECUNDARIO, fontsize=7.5)
+            y -= .135
     else:
         fig.text(.09, .55, "Os dados do Finviz não foram obtidos.", color=TEXTO, fontsize=17, weight="bold")
         fig.text(.09, .45, "O carrossel mantém os slides históricos; esta secção será preenchida numa execução futura.",
                  color=SECUNDARIO, fontsize=11, wrap=True)
-    fig.text(.09, .13, "Snapshot: preço e múltiplos na data/hora acima; rácios de balanço no último balanço disponível (data exata não indicada pelo Finviz). Indicadores descritivos, não uma recomendação.",
-             color=SECUNDARIO, fontsize=7.5, wrap=True)
+    fig.text(.09, .105, "Snapshot: preço e múltiplos na data/hora acima; rácios de balanço no último balanço disponível (data exata não indicada pelo Finviz). Indicadores descritivos, não uma recomendação.",
+             color=SECUNDARIO, fontsize=7, wrap=True)
     fig.savefig(pasta / "slide_11_conclusao.png", dpi=135, facecolor=FUNDO)
     plt.close(fig)
-
-    legenda = (
-        f"{ticker}: análise fundamentalista complementar com métricas do Finviz.\\n\\n"
-        f"Captura dos dados: {capturado} (UTC). Fonte: Finviz — {dados.get('url_fonte', 'https://finviz.com')}.\\n"
-        "P/E, Forward P/E e PEG dependem de resultados históricos e estimativas; "
-        "as previsões podem mudar. Compare sempre empresas do mesmo setor.\\n"
-        "Conteúdo educativo, não constitui aconselhamento financeiro."
-    )
-    (pasta / "legenda_finviz_instagram.txt").write_text(legenda, encoding="utf-8")
     LOG.info("Cinco slides fundamentais guardados em %s", pasta)
