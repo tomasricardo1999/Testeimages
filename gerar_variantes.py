@@ -28,16 +28,16 @@ SAIDA = DADOS / "instagram" / "variantes"
 
 TEMPLATES = {
     "editorial": {
-        "descricao": "Editorial premium",
+        "descricao": "Editorial — revista financeira",
         "cores": {
-            "FUNDO": "#101318", "PAINEL": "#191f27", "TEXTO": "#f3f5f7",
-            "SECUNDARIO": "#aab3bf", "DESTAQUE": "#e21b2d",
-            "VERDE": "#55c49a", "CINZENTO": "#596574",
+            "FUNDO": "#111318", "PAINEL": "#20232a", "TEXTO": "#f4f0e8",
+            "SECUNDARIO": "#b8b1a5", "DESTAQUE": "#c74736",
+            "VERDE": "#7fa58b", "CINZENTO": "#625e59",
         },
-        "fonte": "DejaVu Sans",
+        "fonte": "DejaVu Serif",
     },
     "institucional": {
-        "descricao": "Financeiro institucional",
+        "descricao": "Institucional — relatório corporativo",
         "cores": {
             "FUNDO": "#f4f6f8", "PAINEL": "#e7edf3", "TEXTO": "#172b43",
             "SECUNDARIO": "#536579", "DESTAQUE": "#244f78",
@@ -46,11 +46,11 @@ TEMPLATES = {
         "fonte": "DejaVu Sans",
     },
     "criativo": {
-        "descricao": "Moderno e criativo",
+        "descricao": "Criativo — laboratório de dados",
         "cores": {
-            "FUNDO": "#111827", "PAINEL": "#202c40", "TEXTO": "#f8fafc",
-            "SECUNDARIO": "#c1cada", "DESTAQUE": "#ff6b6b",
-            "VERDE": "#45d6b5", "CINZENTO": "#52627a",
+            "FUNDO": "#10152b", "PAINEL": "#202c49", "TEXTO": "#ffffff",
+            "SECUNDARIO": "#c7d2ee", "DESTAQUE": "#ff5c8a",
+            "VERDE": "#36e0c0", "CINZENTO": "#59698f",
         },
         "fonte": "DejaVu Sans",
     },
@@ -105,3 +105,52 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+def _font(nome: str, tamanho: int):
+    caminhos = {
+        "serif": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+        "bold": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+        "sans": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+    }
+    ficheiro = caminhos[nome]
+    try:
+        return ImageFont.truetype(ficheiro, tamanho)
+    except OSError:
+        return ImageFont.load_default()
+
+
+def aplicar_composicao(pasta: Path, template: str) -> None:
+    """Cria uma moldura/layout próprio por template sem alterar pixels/textos do slide."""
+    for caminho in sorted(pasta.glob("slide_*.png")):
+        original = Image.open(caminho).convert("RGB")
+        if template == "editorial":
+            # Página de revista: papel quente, cabeçalho editorial, filete e imagem emoldurada.
+            canvas = Image.new("RGB", original.size, "#e9e2d6")
+            d = ImageDraw.Draw(canvas)
+            d.text((58, 28), "THE AMD JOURNAL", font=_font("serif", 29), fill="#24211f")
+            d.text((835, 39), "MARKET NOTES  /  2026", font=_font("bold", 12), fill="#62584f")
+            d.line((58, 82, 1022, 82), fill="#c74736", width=4)
+            img = original.resize((936, 1170), Image.Resampling.LANCZOS)
+            canvas.paste(img, (72, 112))
+            d.rectangle((71, 111, 1008, 1282), outline="#292522", width=2)
+            d.line((58, 1302, 1022, 1302), fill="#b9afa1", width=2)
+            d.text((58, 1310), "EQUITY RESEARCH  •  AMD", font=_font("bold", 12), fill="#62584f")
+            d.text((945, 1308), "01—11", font=_font("serif", 15), fill="#c74736")
+        elif template == "criativo":
+            # Poster de dados: moldura assimétrica, formas diagonais e etiqueta de série.
+            canvas = Image.new("RGB", original.size, "#10152b")
+            d = ImageDraw.Draw(canvas)
+            d.polygon([(0, 0), (1080, 0), (1080, 26), (0, 118)], fill="#ff5c8a")
+            d.polygon([(0, 1350), (0, 1280), (1080, 1190), (1080, 1350)], fill="#36e0c0")
+            d.rounded_rectangle((42, 42, 285, 91), radius=20, fill="#ff5c8a")
+            d.text((62, 55), "DATA / VISUALS", font=_font("bold", 17), fill="#10152b")
+            img = original.resize((984, 1230), Image.Resampling.LANCZOS)
+            canvas.paste(img, (48, 100))
+            d.rounded_rectangle((45, 97, 1035, 1333), radius=18, outline="#36e0c0", width=5)
+            d.ellipse((965, 34, 1035, 104), fill="#36e0c0")
+            d.ellipse((985, 54, 1015, 84), fill="#10152b")
+            d.text((54, 1318), "AMD  /  SIGNALS & SYSTEMS", font=_font("bold", 12), fill="#c7d2ee")
+        else:
+            continue
+        canvas.save(caminho, quality=95)
+
