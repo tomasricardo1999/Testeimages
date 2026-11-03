@@ -1,1 +1,12 @@
-AMD | período de mercado: 03/11/2021 a 03/11/2026. Retorno acumulado: +273.16%. CAGR: +30.13%/ano. Retornos anuais calculados por ano civil, com sessões disponíveis. Preço via Yahoo Finance/yfinance; Adj Close usado para retorno quando disponível. Demonstrações anuais referem-se aos exercícios fiscais indicados nos dados. Conteúdo informativo, não constitui aconselhamento financeiro. #AMD #Semicondutores #MercadosFinanceiros #AnáliseFinanceira
+AMD | Análise de mercado e fundamentalista
+
+Período de mercado: 03/11/2021 a 03/11/2026.
+Retorno acumulado: +273.16%.
+CAGR: +30.13%/ano.
+Os retornos anuais são calculados por ano civil, usando a primeira e a última sessão disponível de cada ano. Para o retorno do período é usado o Adj Close quando disponível; caso contrário, Close. Os dados de preço são obtidos via Yahoo Finance/yfinance.
+
+A análise fundamentalista inclui métricas do Finviz. Captura dos dados: 2026-11-03T19:39:56+00:00 (UTC). Fonte: https://finviz.com/stock?t=AMD. P/E, Forward P/E e PEG dependem de resultados históricos e estimativas; as previsões podem mudar. Os rácios de balanço referem-se ao último balanço disponível, cuja data exata não é indicada pelo Finviz.
+
+As demonstrações anuais referem-se aos exercícios fiscais indicados nos dados. Conteúdo informativo e educativo; não constitui aconselhamento financeiro.
+
+#AMD #Semicondutores #MercadosFinanceiros #AnáliseFinanceira
