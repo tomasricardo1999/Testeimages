@@ -1,0 +1,37 @@
+﻿Indicador,Valor,Fonte,Capturado em UTC
+capitalizacao_mercado,4840.89B,Finviz,2026-11-03T21:28:42+00:00
+enterprise_value,4864.28B,Finviz,2026-11-03T21:28:42+00:00
+dividendo_ttm,1.06 (0.32%),Finviz,2026-11-03T21:28:42+00:00
+payout,11.80%,Finviz,2026-11-03T21:28:42+00:00
+pe_trailing,36.96,Finviz,2026-11-03T21:28:42+00:00
+pe_forward,31.61,Finviz,2026-11-03T21:28:42+00:00
+peg,3.86,Finviz,2026-11-03T21:28:42+00:00
+ps,10.11,Finviz,2026-11-03T21:28:42+00:00
+pb,43.00,Finviz,2026-11-03T21:28:42+00:00
+p_fcf,35.58,Finviz,2026-11-03T21:28:42+00:00
+ev_ebitda,28.37,Finviz,2026-11-03T21:28:42+00:00
+ev_sales,10.16,Finviz,2026-11-03T21:28:42+00:00
+quick_ratio,0.94,Finviz,2026-11-03T21:28:42+00:00
+current_ratio,1.02,Finviz,2026-11-03T21:28:42+00:00
+divida_capital_proprio,0.71,Finviz,2026-11-03T21:28:42+00:00
+divida_longo_prazo_capital_proprio,0.61,Finviz,2026-11-03T21:28:42+00:00
+eps_ttm,8.98,Finviz,2026-11-03T21:28:42+00:00
+eps_proximo_ano,10.49,Finviz,2026-11-03T21:28:42+00:00
+crescimento_eps_ano_atual,5.36%,Finviz,2026-11-03T21:28:42+00:00
+crescimento_eps_proximo_ano,10.89%,Finviz,2026-11-03T21:28:42+00:00
+crescimento_eps_5_anos,8.18%,Finviz,2026-11-03T21:28:42+00:00
+crescimento_eps_ttm,32.57%,Finviz,2026-11-03T21:28:42+00:00
+crescimento_vendas_ttm,15.06%,Finviz,2026-11-03T21:28:42+00:00
+crescimento_vendas_trimestre,11.72%,Finviz,2026-11-03T21:28:42+00:00
+roa,34.61%,Finviz,2026-11-03T21:28:42+00:00
+roe,142.26%,Finviz,2026-11-03T21:28:42+00:00
+roic,73.31%,Finviz,2026-11-03T21:28:42+00:00
+margem_bruta,50.87%,Finviz,2026-11-03T21:28:42+00:00
+margem_operacional,33.01%,Finviz,2026-11-03T21:28:42+00:00
+margem_liquida,27.60%,Finviz,2026-11-03T21:28:42+00:00
+short_float,0.90%,Finviz,2026-11-03T21:28:42+00:00
+maximo_52_semanas,351.73 -5.69%,Finviz,2026-11-03T21:28:42+00:00
+minimo_52_semanas,243.42 36.27%,Finviz,2026-11-03T21:28:42+00:00
+consenso_analistas,2.23,Finviz,2026-11-03T21:28:42+00:00
+preco_alvo_analistas,338.28,Finviz,2026-11-03T21:28:42+00:00
+preco,331.70,Finviz,2026-11-03T21:28:42+00:00

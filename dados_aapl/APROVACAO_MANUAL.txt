@@ -1,0 +1,14 @@
+PACOTE DE APROVACAO — AAPL
+ESTADO: RASCUNHO — NAO PUBLICAR AUTOMATICAMENTE
+
+Checklist de revisão humana:
+[ ] Confirmar valores, períodos e fontes dos dados financeiros.
+[ ] Verificar legibilidade, ortografia, cortes e consistência dos 11 slides.
+[ ] Confirmar que a legenda corresponde aos slides e inclui disclaimer.
+[ ] Confirmar adequação das métricas ao modelo de negócio da empresa.
+[ ] Aprovar expressamente o conjunto antes de qualquer publicação.
+
+Resultado da validação estrutural:
+OK: 11 imagens PNG 1080x1350 e legenda presentes em cada variante.
+
+Nenhuma publicação foi efetuada.
