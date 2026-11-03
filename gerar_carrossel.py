@@ -112,6 +112,6 @@ def gerar_carrossel(ticker, precos, resultados, pasta:Path, periodo="5y"):
              "Preço via Yahoo Finance/yfinance; Adj Close usado para retorno quando disponível. "+
              "Demonstrações anuais referem-se aos exercícios fiscais indicados nos dados. "+
              "Conteúdo informativo, não constitui aconselhamento financeiro. "+
-             "#AMD #Semicondutores #MercadosFinanceiros #AnáliseFinanceira")
+             f"#{ticker} #MercadosFinanceiros #AnáliseFinanceira")
     (pasta/"legenda_instagram.txt").write_text(legenda,encoding="utf-8")
     LOG.info("Slides históricos 01-06 gerados (%s a %s).",inicio,fim)
