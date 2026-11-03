@@ -45,12 +45,18 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
     capturado = str(dados.get("capturado_em_utc", "sem dados"))
     fonte = "Métricas recolhidas do Finviz" if ok else "Finviz indisponível nesta execução; métricas não apresentadas"
     grupos = [
-        ("Avaliação bolsista", [
+        (("Dividendos e distribuição" if ticker.upper()=="MAIN" else "Avaliação bolsista"), ([
+            ("Dividendos TTM", "dividendo_ttm", "Montante por ação reportado pelo Finviz; snapshot, não previsão"),
+            ("Payout", "payout", "Definição/metodologia do fornecedor; não substitui cobertura por NII"),
+            ("P/E (TTM)", "pe_trailing", "Múltiplo de avaliação no snapshot"),
+            ("Dividend yield", "dividend_yield", "Yield do snapshot; pode variar com preço e dividendos"),
+        ] if ticker.upper()=="MAIN" else [
+
             ("P/E (TTM)", "pe_trailing", "Preço do snapshot face ao EPS dos últimos 12 meses"),
             ("Forward P/E", "pe_forward", "Preço do snapshot face ao EPS estimado para o próximo exercício"),
             ("PEG", "peg", "Múltiplo de avaliação face ao crescimento esperado; snapshot"),
             ("P/S  •  P/B", None, "P/S usa vendas TTM; P/B usa valor contabilístico do último balanço; snapshot"),
-        ]),
+        ])),
         ("Crescimento", [
             ("Crescimento EPS (ano atual)", "crescimento_eps_ano_atual", "Estimativa para o exercício corrente; snapshot Finviz"),
             ("Crescimento EPS (próximo ano)", "crescimento_eps_proximo_ano", "Estimativa para o exercício seguinte; snapshot Finviz"),
@@ -71,6 +77,8 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
         ]),
     ]
 
+    if ticker.upper()=="MAIN":
+        grupos = grupos[:1] + grupos[1:]
     for idx, (titulo, itens) in enumerate(grupos, start=1):
         fig = _base(ticker, idx + 6, titulo, fonte + f" | Snapshot: {capturado} UTC", capturado)
         linhas = []
