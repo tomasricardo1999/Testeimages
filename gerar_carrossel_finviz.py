@@ -23,9 +23,9 @@ def _base(ticker: str, numero: int, titulo: str, subtitulo: str, data: str):
              fontsize=10, weight="bold")
     fig.text(.075, .865, titulo, color=TEXTO, fontsize=24, weight="bold", va="top", wrap=True)
     fig.text(.075, .77, subtitulo, color=SECUNDARIO, fontsize=10, va="top", wrap=True)
-    fig.text(.075, .045, f"{ticker}  •  FINVIZ  •  CAPTURA: {data}",
+    fig.text(.075, .045, f"{ticker}  •  FINVIZ  •  SNAPSHOT: {data} UTC",
              color=SECUNDARIO, fontsize=7)
-    fig.text(.925, .045, f"{numero:02d} / 05", color=DESTAQUE,
+    fig.text(.925, .045, f"{numero:02d} / 11", color=DESTAQUE,
              fontsize=9, weight="bold", ha="right")
     return fig
 
@@ -46,33 +46,33 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
     fonte = "Métricas recolhidas do Finviz" if ok else "Finviz indisponível nesta execução; métricas não apresentadas"
     grupos = [
         ("Avaliação bolsista", [
-            ("P/E (últimos 12 meses)", "pe_trailing", "Preço face ao lucro histórico"),
-            ("Forward P/E", "pe_forward", "Preço face ao lucro estimado"),
-            ("PEG", "peg", "Avaliação ajustada ao crescimento esperado"),
-            ("P/S  •  P/B", None, "Múltiplos de vendas e valor contabilístico"),
+            ("P/E (TTM)", "pe_trailing", "Preço do snapshot face ao EPS dos últimos 12 meses"),
+            ("Forward P/E", "pe_forward", "Preço do snapshot face ao EPS estimado para o próximo exercício"),
+            ("PEG", "peg", "Múltiplo de avaliação face ao crescimento esperado; snapshot"),
+            ("P/S  •  P/B", None, "P/S usa vendas TTM; P/B usa valor contabilístico do último balanço; snapshot"),
         ]),
         ("Crescimento", [
-            ("Crescimento EPS (ano atual)", "crescimento_eps_ano_atual", "Variação estimada do lucro por ação"),
-            ("Crescimento EPS (próximo ano)", "crescimento_eps_proximo_ano", "Estimativa para o próximo exercício"),
-            ("Crescimento EPS (5 anos)", "crescimento_eps_5_anos", "Projeção anualizada de longo prazo"),
-            ("Vendas Y/Y (TTM)", "crescimento_vendas_ttm", "Crescimento das vendas nos últimos 12 meses"),
+            ("Crescimento EPS (ano atual)", "crescimento_eps_ano_atual", "Estimativa para o exercício corrente; snapshot Finviz"),
+            ("Crescimento EPS (próximo ano)", "crescimento_eps_proximo_ano", "Estimativa para o exercício seguinte; snapshot Finviz"),
+            ("Crescimento EPS (5 anos)", "crescimento_eps_5_anos", "Estimativa anualizada para os próximos 5 anos; snapshot Finviz"),
+            ("Vendas Y/Y (TTM)", "crescimento_vendas_ttm", "Últimos 12 meses face aos 12 meses anteriores; snapshot Finviz"),
         ]),
         ("Rentabilidade", [
-            ("Margem bruta", "margem_bruta", "Percentagem das vendas após custo direto"),
-            ("Margem operacional", "margem_operacional", "Resultado operacional sobre vendas"),
-            ("Margem líquida", "margem_liquida", "Lucro líquido sobre vendas"),
+            ("Margem bruta", "margem_bruta", "TTM / últimos 12 meses; snapshot Finviz"),
+            ("Margem operacional", "margem_operacional", "TTM / últimos 12 meses; snapshot Finviz"),
+            ("Margem líquida", "margem_liquida", "TTM / últimos 12 meses; snapshot Finviz"),
             ("ROE  •  ROA  •  ROIC", None, "Retorno sobre capital próprio, ativos e capital investido"),
         ]),
         ("Balanço e risco", [
-            ("Debt / Equity", "divida_capital_proprio", "Dívida face ao capital próprio"),
-            ("Current Ratio", "current_ratio", "Capacidade de cobrir obrigações correntes"),
-            ("Quick Ratio", "quick_ratio", "Liquidez sem depender de inventário"),
-            ("EV / EBITDA", "ev_ebitda", "Valor da empresa face ao EBITDA"),
+            ("Debt / Equity", "divida_capital_proprio", "Último balanço disponível; Finviz não fornece aqui a data exata do balanço"),
+            ("Current Ratio", "current_ratio", "Último balanço disponível; data-base exata não exposta pelo Finviz"),
+            ("Quick Ratio", "quick_ratio", "Último balanço disponível; data-base exata não exposta pelo Finviz"),
+            ("EV / EBITDA", "ev_ebitda", "Múltiplo de avaliação no snapshot Finviz; EBITDA TTM"),
         ]),
     ]
 
     for idx, (titulo, itens) in enumerate(grupos, start=1):
-        fig = _base(ticker, idx, titulo, fonte, capturado)
+        fig = _base(ticker, idx + 6, titulo, fonte + f" | Snapshot: {capturado} UTC", capturado)
         linhas = []
         for label, key, nota in itens:
             if key:
@@ -83,10 +83,10 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
                 valor = f'ROE {m.get("roe", "N/D")}  |  ROA {m.get("roa", "N/D")}  |  ROIC {m.get("roic", "N/D")}'
             linhas.append((label, str(valor), nota))
         _cartoes(fig, linhas)
-        fig.savefig(pasta / f"finviz_slide_{idx:02d}.png", dpi=135, facecolor=FUNDO)
+        fig.savefig(pasta / f"slide_{idx + 6:02d}_finviz.png", dpi=135, facecolor=FUNDO)
         plt.close(fig)
 
-    fig = _base(ticker, 5, "O que fica desta análise?", fonte, capturado)
+    fig = _base(ticker, 11, "Conclusão: olhar o conjunto", fonte + f" | Snapshot: {capturado} UTC", capturado)
     if ok:
         resumo = [
             ("Preço / lucro", f'P/E {m.get("pe_trailing", "N/D")}  |  Forward {m.get("pe_forward", "N/D")}', "Múltiplos diferentes: histórico vs. estimativa"),
@@ -101,7 +101,7 @@ def gerar_carrossel_finviz(ticker: str, dados: dict, pasta: Path) -> None:
                  color=SECUNDARIO, fontsize=11, wrap=True)
     fig.text(.09, .13, "Indicadores descritivos, não uma recomendação de compra ou venda.",
              color=SECUNDARIO, fontsize=9, wrap=True)
-    fig.savefig(pasta / "finviz_slide_05.png", dpi=135, facecolor=FUNDO)
+    fig.savefig(pasta / "slide_11_conclusao.png", dpi=135, facecolor=FUNDO)
     plt.close(fig)
 
     legenda = (
