@@ -50,6 +50,7 @@ CAMPOS = {
     "Quick Ratio": "quick_ratio",
     "Payout": "payout",
     "Dividend TTM": "dividendo_ttm",
+    "Dividend Yield": "dividend_yield",
     "Short Float": "short_float",
     "Recom": "consenso_analistas",
     "Target Price": "preco_alvo_analistas",
