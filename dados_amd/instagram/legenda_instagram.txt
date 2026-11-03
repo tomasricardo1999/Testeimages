@@ -1,7 +1,1 @@
-AMD em análise: evolução do preço, volume negociado e indicadores financeiros.
-
-Período consultado: 5y. Último dado de preço: 03/11/2026.
-Fonte: Yahoo Finance (via yfinance). Os dados podem ter atraso, alterações ou limitações.
-Conteúdo meramente informativo e educativo; não constitui aconselhamento financeiro nem recomendação de compra ou venda.
-
-#AMD #Semicondutores #MercadosFinanceiros #Investimento #AnáliseFinanceira
+AMD | período de mercado: 03/11/2021 a 03/11/2026. Retorno acumulado: +273.16%. CAGR: +30.13%/ano. Retornos anuais calculados por ano civil, com sessões disponíveis. Preço via Yahoo Finance/yfinance; Adj Close usado para retorno quando disponível. Demonstrações anuais referem-se aos exercícios fiscais indicados nos dados. Conteúdo informativo, não constitui aconselhamento financeiro. #AMD #Semicondutores #MercadosFinanceiros #AnáliseFinanceira
