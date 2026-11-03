@@ -88,22 +88,37 @@ def gerar_carrossel(ticker, precos, resultados, pasta:Path, periodo="5y"):
         fig.text(.10,.16,f"Mediana por sessão: {vol.median():,.0f} ações",color=TEXTO,fontsize=12,weight="bold")
     else: fig.text(.10,.48,"Volume indisponível.",color=SECUNDARIO,fontsize=14)
     fig.savefig(pasta/"slide_05_volume.png",dpi=135,facecolor=FUNDO); plt.close(fig)
-    # 06 resultados anuais
-    fig=_base(ticker,"Receita e lucro reportados",6,"Demonstração anual: cada coluna representa um exercício fiscal (não uma data diária).",inicio,fim)
+    # 06 Fundamentos: MAIN é uma BDC, pelo que o Net Interest Income (NII)
+    # é mais informativo do que uma leitura convencional de receita operacional.
     fin=pd.DataFrame()
     if resultados is not None and not resultados.empty:
         idx={str(i).lower():i for i in resultados.index}
-        rk=next((v for k,v in idx.items() if "total revenue" in k or k=="revenue"),None)
         lk=next((v for k,v in idx.items() if "net income" in k),None)
-        if rk is not None: fin["Receita"]=pd.to_numeric(resultados.loc[rk],errors="coerce")
-        if lk is not None: fin["Lucro líquido"]=pd.to_numeric(resultados.loc[lk],errors="coerce")
+        if ticker.upper()=="MAIN":
+            nk=next((v for k,v in idx.items() if k=="net interest income"),None)
+            if nk is not None: fin["Net Interest Income (NII)"]=pd.to_numeric(resultados.loc[nk],errors="coerce")
+            if lk is not None: fin["Lucro líquido"]=pd.to_numeric(resultados.loc[lk],errors="coerce")
+            titulo="MAIN: rendimento líquido de juros (NII)"
+            subtitulo="BDC: NII e lucro líquido reportados por exercício fiscal. NII não equivale automaticamente a caixa distribuível."
+        else:
+            rk=next((v for k,v in idx.items() if "total revenue" in k or k=="revenue"),None)
+            if rk is not None: fin["Receita"]=pd.to_numeric(resultados.loc[rk],errors="coerce")
+            if lk is not None: fin["Lucro líquido"]=pd.to_numeric(resultados.loc[lk],errors="coerce")
+            titulo="Receita e lucro reportados"
+            subtitulo="Demonstração anual: cada coluna representa um exercício fiscal (não uma data diária)."
         fin=fin.dropna(how="all").sort_index()
+    else:
+        titulo="Fundamentos reportados"
+        subtitulo="Demonstração anual indisponível."
+    fig=_base(ticker,titulo,6,subtitulo,inicio,fim)
     if not fin.empty:
         ax=fig.add_axes([.10,.25,.82,.43]); _eixo(ax)
         fin.plot(kind="bar",ax=ax,color=[DESTAQUE,VERDE][:len(fin.columns)])
         ax.set_ylabel("Valor reportado (USD)"); ax.set_xlabel("Fim do exercício fiscal")
         ax.tick_params(axis="x",rotation=20); ax.legend(facecolor=PAINEL,labelcolor=TEXTO,fontsize=8)
-        fig.text(.10,.15,"A data no eixo corresponde ao período fiscal reportado pelo Yahoo Finance.",color=SECUNDARIO,fontsize=8)
+        nota=("NII = juros recebidos menos despesas de juros; consulte também NII por ação e distribuições declaradas."
+              if ticker.upper()=="MAIN" else "A data no eixo corresponde ao período fiscal reportado pelo Yahoo Finance.")
+        fig.text(.10,.15,nota,color=SECUNDARIO,fontsize=8,wrap=True)
     else: fig.text(.10,.48,"Demonstração anual indisponível.",color=SECUNDARIO,fontsize=14)
     fig.savefig(pasta/"slide_06_receita_lucro.png",dpi=135,facecolor=FUNDO); plt.close(fig)
     legenda=(f"{ticker} | período de mercado: {inicio} a {fim}. Retorno acumulado: {ret:+.2f}%. "+
@@ -111,6 +126,7 @@ def gerar_carrossel(ticker, precos, resultados, pasta:Path, periodo="5y"):
              "Retornos anuais calculados por ano civil, com sessões disponíveis. "+
              "Preço via Yahoo Finance/yfinance; Adj Close usado para retorno quando disponível. "+
              "Demonstrações anuais referem-se aos exercícios fiscais indicados nos dados. "+
+             ("MAIN é uma BDC: avaliar NII por ação, distribuições e respetiva cobertura antes de tirar conclusões sobre o dividendo. " if ticker.upper()=="MAIN" else "")+
              "Conteúdo informativo, não constitui aconselhamento financeiro. "+
              f"#{ticker} #MercadosFinanceiros #AnáliseFinanceira")
     (pasta/"legenda_instagram.txt").write_text(legenda,encoding="utf-8")
