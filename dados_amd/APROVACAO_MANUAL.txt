@@ -8,10 +8,6 @@ Checklist de revisão humana:
 [ ] Confirmar adequação das métricas ao modelo de negócio da empresa.
 [ ] Aprovar expressamente o conjunto antes de qualquer publicação.
 
-Nota MAIN/BDC: validar NII por ação, distribuições declaradas por ação,
-cobertura do dividendo por NII e dividendos especiais/extraordinários.
-Dividend yield e payout são snapshots e não provam cobertura futura.
-
 Resultado da validação estrutural:
 OK: 11 imagens PNG 1080x1350 e legenda presentes em cada variante.
 
