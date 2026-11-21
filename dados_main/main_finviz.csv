@@ -1,37 +1,37 @@
 ﻿Indicador,Valor,Fonte,Capturado em UTC
-capitalizacao_mercado,5.22B,Finviz,2026-11-20T02:28:20+00:00
-enterprise_value,7.72B,Finviz,2026-11-20T02:28:20+00:00
-dividendo_ttm,3.11 ( 5.59% ),Finviz,2026-11-20T02:28:20+00:00
-payout,55.06%,Finviz,2026-11-20T02:28:20+00:00
-pe_trailing,11.52,Finviz,2026-11-20T02:28:20+00:00
-pe_forward,14.60,Finviz,2026-11-20T02:28:20+00:00
-peg,60.81,Finviz,2026-11-20T02:28:20+00:00
-ps,7.72,Finviz,2026-11-20T02:28:20+00:00
-pb,1.63,Finviz,2026-11-20T02:28:20+00:00
-p_fcf,15.53,Finviz,2026-11-20T02:28:20+00:00
-ev_ebitda,12.48,Finviz,2026-11-20T02:28:20+00:00
-ev_sales,11.42,Finviz,2026-11-20T02:28:20+00:00
-quick_ratio,0.12,Finviz,2026-11-20T02:28:20+00:00
-current_ratio,0.12,Finviz,2026-11-20T02:28:20+00:00
-divida_capital_proprio,0.81,Finviz,2026-11-20T02:28:20+00:00
-divida_longo_prazo_capital_proprio,0.44,Finviz,2026-11-20T02:28:20+00:00
-eps_ttm,4.83,Finviz,2026-11-20T02:28:20+00:00
-eps_proximo_ano,3.81,Finviz,2026-11-20T02:28:20+00:00
-crescimento_eps_ano_atual,-6.02%,Finviz,2026-11-20T02:28:20+00:00
-crescimento_eps_proximo_ano,2.73%,Finviz,2026-11-20T02:28:20+00:00
-crescimento_eps_5_anos,0.24%,Finviz,2026-11-20T02:28:20+00:00
-crescimento_eps_ttm,-19.91%,Finviz,2026-11-20T02:28:20+00:00
-crescimento_vendas_ttm,9.62%,Finviz,2026-11-20T02:28:20+00:00
-crescimento_vendas_trimestre,-4.49%,Finviz,2026-11-20T02:28:20+00:00
-roa,7.85%,Finviz,2026-11-20T02:28:20+00:00
-roe,14.48%,Finviz,2026-11-20T02:28:20+00:00
-roic,9.65%,Finviz,2026-11-20T02:28:20+00:00
-margem_bruta,100.00%,Finviz,2026-11-20T02:28:20+00:00
-margem_operacional,91.46%,Finviz,2026-11-20T02:28:20+00:00
-margem_liquida,65.76%,Finviz,2026-11-20T02:28:20+00:00
-short_float,10.16%,Finviz,2026-11-20T02:28:20+00:00
-maximo_52_semanas,64.15 -13.24%,Finviz,2026-11-20T02:28:20+00:00
-minimo_52_semanas,48.40 15.00%,Finviz,2026-11-20T02:28:20+00:00
-consenso_analistas,2.50,Finviz,2026-11-20T02:28:20+00:00
-preco_alvo_analistas,60.14,Finviz,2026-11-20T02:28:20+00:00
-preco,55.66,Finviz,2026-11-20T02:28:20+00:00
+capitalizacao_mercado,5.17B,Finviz,2026-11-21T02:39:02+00:00
+enterprise_value,7.66B,Finviz,2026-11-21T02:39:02+00:00
+dividendo_ttm,3.11 ( 5.65% ),Finviz,2026-11-21T02:39:02+00:00
+payout,55.06%,Finviz,2026-11-21T02:39:02+00:00
+pe_trailing,11.40,Finviz,2026-11-21T02:39:02+00:00
+pe_forward,14.44,Finviz,2026-11-21T02:39:02+00:00
+peg,60.15,Finviz,2026-11-21T02:39:02+00:00
+ps,7.64,Finviz,2026-11-21T02:39:02+00:00
+pb,1.61,Finviz,2026-11-21T02:39:02+00:00
+p_fcf,15.36,Finviz,2026-11-21T02:39:02+00:00
+ev_ebitda,12.39,Finviz,2026-11-21T02:39:02+00:00
+ev_sales,11.33,Finviz,2026-11-21T02:39:02+00:00
+quick_ratio,0.12,Finviz,2026-11-21T02:39:02+00:00
+current_ratio,0.12,Finviz,2026-11-21T02:39:02+00:00
+divida_capital_proprio,0.81,Finviz,2026-11-21T02:39:02+00:00
+divida_longo_prazo_capital_proprio,0.44,Finviz,2026-11-21T02:39:02+00:00
+eps_ttm,4.83,Finviz,2026-11-21T02:39:02+00:00
+eps_proximo_ano,3.81,Finviz,2026-11-21T02:39:02+00:00
+crescimento_eps_ano_atual,-6.02%,Finviz,2026-11-21T02:39:02+00:00
+crescimento_eps_proximo_ano,2.73%,Finviz,2026-11-21T02:39:02+00:00
+crescimento_eps_5_anos,0.24%,Finviz,2026-11-21T02:39:02+00:00
+crescimento_eps_ttm,-19.91%,Finviz,2026-11-21T02:39:02+00:00
+crescimento_vendas_ttm,9.62%,Finviz,2026-11-21T02:39:02+00:00
+crescimento_vendas_trimestre,-4.49%,Finviz,2026-11-21T02:39:02+00:00
+roa,7.85%,Finviz,2026-11-21T02:39:02+00:00
+roe,14.48%,Finviz,2026-11-21T02:39:02+00:00
+roic,9.65%,Finviz,2026-11-21T02:39:02+00:00
+margem_bruta,100.00%,Finviz,2026-11-21T02:39:02+00:00
+margem_operacional,91.46%,Finviz,2026-11-21T02:39:02+00:00
+margem_liquida,65.76%,Finviz,2026-11-21T02:39:02+00:00
+short_float,10.16%,Finviz,2026-11-21T02:39:02+00:00
+maximo_52_semanas,64.15 -14.19%,Finviz,2026-11-21T02:39:02+00:00
+minimo_52_semanas,48.40 13.73%,Finviz,2026-11-21T02:39:02+00:00
+consenso_analistas,2.50,Finviz,2026-11-21T02:39:02+00:00
+preco_alvo_analistas,60.14,Finviz,2026-11-21T02:39:02+00:00
+preco,55.05,Finviz,2026-11-21T02:39:02+00:00
