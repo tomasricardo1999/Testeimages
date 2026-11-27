@@ -2,7 +2,7 @@
   "ticker": "MAIN",
   "fonte": "Finviz",
   "url_fonte": "https://finviz.com/stock?t=MAIN",
-  "capturado_em_utc": "2026-11-26T03:41:26+00:00",
+  "capturado_em_utc": "2026-11-27T03:42:27+00:00",
   "metricas": {
     "capitalizacao_mercado": "5.41B",
     "enterprise_value": "7.91B",
